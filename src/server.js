@@ -1,10 +1,13 @@
 const express = require ('express')
+const cors = require('cors');
+
 const app = express()
 
 const routersCourses = require('./routers/courses');
 const routersVideos = require('./routers/videos');
 const routersCategories = require('./routers/categories');
 
+app.use(cors())
 app.use(express.json());
 app.use('/courses', routersCourses);
 app.use('/videos', routersVideos);
