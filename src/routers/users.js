@@ -1,13 +1,31 @@
 const express = require ('express')
 const usersUseCases = require ('../usecases/users')
 
+const auth = require('../middlewares/auth')
+
 const router = express.Router ()
+
+router.use(auth)
 
 router.get ('/', async (req, res) => {
     try {
         
-        const users = await usersUseCases.getAll()
+        const { email } = req.query 
+        let users
 
+        if (email) {
+            users = await userUseCases.findOne ({email})
+            res.status (200).json ({
+                success: true,
+                message: 'User by email',
+                data: {
+                    users
+                }
+            })
+            return null
+        }
+
+        users= await userUseCases.getAll()
         res.status (200).json ({
             success: true,
             messages: 'All users',
@@ -24,27 +42,6 @@ router.get ('/', async (req, res) => {
     }
 })
 
-router.get ('/', async (req, res) => { // ¿('/:emal')?
-    try {
-        const { email } = req.query
-        const usersByEmail = await usersUseCases.getByEmail(email)
-        res.status (200).json ({
-            success: true,
-            messages: 'User by email',
-            data: {
-                usersByEmail 
-            }
-        })
-        
-    } catch (error) {
-        res.status(400).json ({
-            success: false,
-            message: 'Error getting users by email',
-            data: error.message
-    })
-}
-})
-
 router.post ('/', async (req, res) => {
     try {
         const userSignedUp = await usersUseCases.signUp(req.body)
@@ -58,7 +55,7 @@ router.post ('/', async (req, res) => {
     } catch (error) {
         res.status(400).json ({
             success: false,
-            message: 'Error getting users by email',
+            message: 'Could not sign up',
             data: error.message
 
         })
@@ -66,6 +63,28 @@ router.post ('/', async (req, res) => {
 })
 
 // ¿El router de signIn?
+
+router.post('/sigin', async (req, res)=>{
+    try {
+        const {email, password} = req.body
+        const token = await users.signin(email, password)//login¿?
+        res.json ({
+            success: true,
+            message: 'Signed In',
+            data: {
+                token
+            }
+        })
+
+    } catch (error) {
+        res.status(400).json ({
+            success: false,
+            message: 'Could not sign in',
+            data: error.message
+        
+        })
+    }
+})
 
 router.patch ('/:id', async (req, res) => {
     try {
@@ -91,7 +110,7 @@ router.patch ('/:id', async (req, res) => {
     }
 })
 
-router.delete('/', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const {id} = req.params
         const userDeleted = await usersUseCases.deleteById(id)

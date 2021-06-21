@@ -26,6 +26,7 @@ const usersSchema = new.mongoose.Schema ({
         type: String,
         minLength: 2,
         maxLength: 100,
+        match: /.+@.+\..+/,
         required: true
     },
 
@@ -46,7 +47,6 @@ const usersSchema = new.mongoose.Schema ({
     password: {
         type: String,
         minLength: 2,
-        maxLength: 100,
         required: true
         //Falta regex
     },
@@ -65,3 +65,4 @@ const usersSchema = new.mongoose.Schema ({
 const model = mongoose.model ('users', usersSchema)
 
 module.exports = model
+
