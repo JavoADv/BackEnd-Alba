@@ -1,6 +1,6 @@
 const mongoose = require ('mongoose')
 
-const usersSchema = new.mongoose.Schema ({
+const usersSchema = new mongoose.Schema ({
     name: {
         type: String,
         minLength: 2,
@@ -52,8 +52,8 @@ const usersSchema = new.mongoose.Schema ({
     },
 
     role: {
-        type: String,
-        minLength: 2,
+        type: [String],
+        minLength: 1,
         maxLength: 50,
         required: true,
         enum: ['admin', 'partner', 'user']},

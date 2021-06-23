@@ -10,7 +10,11 @@ function getByEmail (email) {
     return Users.findOne({ email})
 }
 
-function signUp ({name, lastName, userName, email, password}) {
+function getById (id){
+    return Users.findById(id)
+}
+
+async function signUp ({name, lastName, userName, email, password}) {
     const userFound = await Users.findOne({email: email})
 
     if (userFound) {
@@ -51,6 +55,7 @@ function deleteById (id) {
 module.exports = {
     getAll,
     getByEmail,
+    getById,
     signUp,
     signIn,
     updateById,

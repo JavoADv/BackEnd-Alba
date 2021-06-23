@@ -4,7 +4,7 @@ const app = express()
 const routersCourses = require('./routers/courses');
 const routersVideos = require('./routers/videos');
 const routersCategories = require('./routers/categories');
-const routersUsers = requires ('./routers/users') 
+const routersUsers = require ('./routers/users') 
 
 app.use(express.json());
 app.use('/courses', routersCourses);
