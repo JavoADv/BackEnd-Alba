@@ -14,7 +14,7 @@ router.get ('/', async (req, res) => {
         let users
 
         if (email) {
-            users = await userUseCases.findOne ({email})
+            users = await userUseCases.getByEmail (email)
             res.status (200).json ({
                 success: true,
                 message: 'User by email',
@@ -42,7 +42,7 @@ router.get ('/', async (req, res) => {
     }
 })
 
-router.post ('/', async (req, res) => {
+router.post ('/signup', async (req, res) => {
     try {
         const userSignedUp = await usersUseCases.signUp(req.body)
         res.status (200).json({

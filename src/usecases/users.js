@@ -7,7 +7,7 @@ function getAll () {
 }
 
 function getByEmail (email) {
-    return Users.findById({ email})
+    return Users.findOne({ email})
 }
 
 function signUp ({name, lastName, userName, email, password}) {
