@@ -4,7 +4,7 @@ const users = require ('../usecases/users')
 function auth (req, res, next) {
    try {
     const {auth: token } = req.headers
-    // console.log('token: ', token)
+    console.log('token: ', token)
     const validToken = jwt.verify(token)
     if (!validToken) {
         throw new Error('Not authorized')

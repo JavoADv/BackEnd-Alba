@@ -53,10 +53,11 @@ const usersSchema = new mongoose.Schema ({
 
     role: {
         type: [String],
+        enum: ['admin', 'partner', 'user'],
         minLength: 1,
         maxLength: 50,
         required: true,
-        enum: ['admin', 'partner', 'user']},
+        },
 
     purchasedCourses: [],
 

@@ -14,7 +14,7 @@ function getById (id){
     return Users.findById(id)
 }
 
-async function signUp ({name, lastName, userName, email, password}) {
+async function signUp ({name, lastName, userName, email, password, role}) {
     const userFound = await Users.findOne({email: email})
 
     if (userFound) {
@@ -23,7 +23,7 @@ async function signUp ({name, lastName, userName, email, password}) {
 
     const encriptedPassword = await bcrypt.hash(password)
 
-    return Users.create ({name, lastName, userName, email, password: encriptedPassword})
+    return Users.create ({name, lastName, userName, email, password: encriptedPassword, role})
 }
 
 // function sigIn ¿?
