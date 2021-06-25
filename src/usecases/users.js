@@ -7,10 +7,14 @@ function getAll () {
 }
 
 function getByEmail (email) {
-    return Users.findById({ email})
+    return Users.findOne({ email})
 }
 
-function signUp ({name, lastName, userName, email, password}) {
+function getById (id){
+    return Users.findById(id)
+}
+
+async function signUp ({name, lastName, userName, email, password, role}) {
     const userFound = await Users.findOne({email: email})
 
     if (userFound) {
@@ -19,7 +23,7 @@ function signUp ({name, lastName, userName, email, password}) {
 
     const encriptedPassword = await bcrypt.hash(password)
 
-    return Users.create ({name, lastName, userName, email, password: encriptedPassword})
+    return Users.create ({name, lastName, userName, email, password: encriptedPassword, role})
 }
 
 // function sigIn ¿?
@@ -51,6 +55,7 @@ function deleteById (id) {
 module.exports = {
     getAll,
     getByEmail,
+    getById,
     signUp,
     signIn,
     updateById,
