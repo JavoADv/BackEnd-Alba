@@ -2,12 +2,7 @@
 
 const mongoose = require ('mongoose')
 
-const DB_USER = 'albaapp'
-const DB_PASSWORD = 'AlbaDB21'
-const DB_HOST = 'back-end-alba.r4qe1.mongodb.net'
-const DB_NAME = 'test' //¿Hay que cambiarlo cuando se crea la DB?
-
-const url = `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`
+const url = process.env.DB_URL
 
 function connect () {
     return mongoose.connect (url, {useNewUrlParser: true, useUnifiedTopology: true})
