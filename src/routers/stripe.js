@@ -7,6 +7,12 @@ router.get('/success', async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
     const customer = await stripe.customers.retrieve(session.customer);
     const subscription = await stripe.subscriptions.retrieve(session.subscription);
+    /* CONSEGUIR TOKEN DEL USUARIO */
+
+    /** DESENCRIPTAR TOKEN */
+
+    /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
+
     res.send(`<html><body><h1>Gracias por suscribirte ${customer.name} :D!</h1></body></html>`);
     res.end()
 });
@@ -17,7 +23,7 @@ router.get('/customers/:id', async (req, res) => {
         const customer = await stripe.customers.retrieve(id);
         res.status(200).json({
             sucess: true,
-            message: 'Subscription by id',
+            message: 'Customer by id',
             data: {
                 subscription
             }
@@ -25,16 +31,27 @@ router.get('/customers/:id', async (req, res) => {
     } catch (error) {
         res.status(400).json({
             sucess: false,
-            message: 'Subscription by id failed request',
+            message: error.message,
             data: null
         })
     }
 })
 
-router.get('/subscriptions/:id', async (req, res) => {
+router.get('/subscriptions', async (req, res) => {
     try {
+        /* CONSEGUIR TOKEN DEL USUARIO */
+
+        /** DESENCRIPTAR TOKEN */
+
+        /* Traer la data de la subscripcion */
         const { id } = req.params;
         const subscription = await stripe.subscriptions.retrieve(id);
+        /* CONSEGUIR TOKEN DEL USUARIO */
+
+        /** DESENCRIPTAR TOKEN */
+
+        /* Traer la data de la subscripcion */
+        
         res.status(200).json({
             sucess: true,
             message: 'Subscription by id',
@@ -45,7 +62,7 @@ router.get('/subscriptions/:id', async (req, res) => {
     } catch (error) {
         res.status(400).json({
             sucess: false,
-            message: 'Subscription by id failed request',
+            message: error.message,
             data: null
         })
     }
@@ -65,7 +82,7 @@ router.delete('/subscriptions/:id', async (req, res) => {
     } catch (error) {
         res.status(400).json({
             sucess: false,
-            message: 'Subscription canceled failure',
+            message: error.message,
             data: null
         })
     }
