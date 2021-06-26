@@ -1,57 +1,73 @@
 const router = require('express').Router();
 const SECRET_STRIPE_KEY = process.env.SECRET_STRIPE_KEY;
 const stripe = require('stripe')(SECRET_STRIPE_KEY);
+const userUsesCases = require('../usecases/users');
+const authMiddlewares = require('../middlewares/auth');
 
 
-router.get('/success', async (req, res) => {
+router.patch('/success', authMiddlewares.auth ,async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
-    const customer = await stripe.customers.retrieve(session.customer);
     const subscription = await stripe.subscriptions.retrieve(session.subscription);
-    /* CONSEGUIR TOKEN DEL USUARIO */
-
-    /** DESENCRIPTAR TOKEN */
-
-    /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
-
-    res.send(`<html><body><h1>Gracias por suscribirte ${customer.name} :D!</h1></body></html>`);
-    res.end()
-});
-
-router.get('/customers/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const customer = await stripe.customers.retrieve(id);
-        res.status(200).json({
-            sucess: true,
-            message: 'Customer by id',
-            data: {
-                subscription
-            }
-        })
-    } catch (error) {
+    
+    const { auth } = req.headers;
+    if (!auth) {
         res.status(400).json({
             sucess: false,
-            message: error.message,
+            message: 'No auth',
             data: null
         })
+        return;
     }
-})
 
-router.get('/subscriptions', async (req, res) => {
+    /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
+    const user = await userUsesCases.getProfile(auth);
+    const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: subscription.id});
+    res.redirect('/success/completed-subscription');
+    res.end();
+});
+
+router.get('/success/completed-subscription', authMiddlewares.auth, async (req, res) => {
+    const { auth } = req.headers;
+    if (!auth) {
+        res.status(400).json({
+            sucess: false,
+            message: 'No auth',
+            data: null
+        })
+        return;
+    }
+    /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
+    const user = await userUsesCases.getProfile(auth);
+    res.redirect('/success/completed-subscription');
+    res.send(`<html><body><h1>Gracias por suscribirte ${user.name}!</h1></body></html>`);
+    res.end();
+});
+
+router.get('/subscription', authMiddlewares.auth, async (req, res) => {
     try {
-        /* CONSEGUIR TOKEN DEL USUARIO */
+        const { auth } = req.headers;
+        if (!auth) {
+            res.status(400).json({
+                sucess: false,
+                message: 'No auth',
+                data: null
+            })
+            return;
+        }
 
-        /** DESENCRIPTAR TOKEN */
+        const user = await userUsesCases.getProfile(auth);
 
         /* Traer la data de la subscripcion */
-        const { id } = req.params;
-        const subscription = await stripe.subscriptions.retrieve(id);
-        /* CONSEGUIR TOKEN DEL USUARIO */
-
-        /** DESENCRIPTAR TOKEN */
-
-        /* Traer la data de la subscripcion */
-        
+        const { subscriptionId } = user;
+        if (!subscriptionId) {
+            res.status(400).json({
+                sucess: false,
+                message: 'No Subscription Id',
+                data: null
+            })
+            return;
+        }
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         res.status(200).json({
             sucess: true,
             message: 'Subscription by id',
@@ -59,6 +75,7 @@ router.get('/subscriptions', async (req, res) => {
                 subscription
             }
         })
+
     } catch (error) {
         res.status(400).json({
             sucess: false,
@@ -68,7 +85,7 @@ router.get('/subscriptions', async (req, res) => {
     }
 })
 
-router.delete('/subscriptions/:id', async (req, res) => {
+router.delete('/subscriptions/:id', authMiddlewares.auth, async (req, res) => {
     try {
         const { id } = req.params;
         const canceledSub = await stripe.subscriptions.del(id);
@@ -88,13 +105,12 @@ router.delete('/subscriptions/:id', async (req, res) => {
     }
 })
 
-router.get('/canceled', async (req, res) => {
+router.get('/canceled', authMiddlewares.auth, async (req, res) => {
     res.send(`<html><body><h1>Process canceled</h1></body></html>`);
     res.end()
 });
 
-
-router.post('/create-checkout-session', async (req, res) => {
+router.post('/create-checkout-session', authMiddlewares.auth, async (req, res) => {
     const { priceId } = req.body;
     try {
         const session = await stripe.checkout.sessions.create({
