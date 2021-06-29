@@ -8,7 +8,7 @@ const router = express.Router ()
 // router.use(auth)
 
 // El admin tiene permiso para obtener a los usuarios
-router.get ('/', authMiddleWares.hasRole(['admin']), async (req, res) => {
+router.get ('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
         
         const { email } = req.query 
@@ -66,7 +66,7 @@ router.post ('/signup',  async (req, res) => {
 
 // ¿El router de signIn?
 //Todos los usuarios pueden entrar 
-router.post('/sigin', authMiddleWares.hasRole(['admin, user, partner']), async (req, res)=>{
+router.post('/sigin', authMiddleWares.auth, authMiddleWares.hasRole(['admin, user, partner']), async (req, res)=>{
     try {
         const {email, password} = req.body
         const token = await users.signin(email, password)//login¿?
@@ -89,7 +89,7 @@ router.post('/sigin', authMiddleWares.hasRole(['admin, user, partner']), async (
 })
 
 //El admin tiene permiso para actualizar 
-router.patch ('/:id', authMiddleWares.hasRole(['admin']), async (req, res) => {
+router.patch ('/:id', authMiddleWares.auth,  authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
         const {id} = req.params
         const dataUpdated = req.body
@@ -114,7 +114,7 @@ router.patch ('/:id', authMiddleWares.hasRole(['admin']), async (req, res) => {
 })
 
 //El admin tiene permiso para borrar 
-router.delete('/:id', authMiddleWares.hasRole(['admin']), async (req, res) => {
+router.delete('/:id',authMiddleWares.auth,  authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
         const {id} = req.params
         const userDeleted = await usersUseCases.deleteById(id)
