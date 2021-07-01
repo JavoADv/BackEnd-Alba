@@ -1,21 +1,21 @@
-const Users = require ('../models/users')
+const User = require ('../models/users')
 const bcrypt = require ('../lib/bcrypt')
 const jwt = require ('../lib/jwt')
 
 function getAll () {
-    return Users.find ({})
+    return User.find({})
 }
 
 function getByEmail (email) {
-    return Users.findOne({ email})
+    return User.findOne({ email})
 }
 
 function getById (id){
-    return Users.findById(id)
+    return User.findById(id)
 }
 
 async function signUp ({name, lastName, userName, email, password, role}) {
-    const userFound = await Users.findOne({email: email})
+    const userFound = await User.findOne({email: email})
 
     if (userFound) {
         throw new Error ('User already exists')
@@ -23,13 +23,13 @@ async function signUp ({name, lastName, userName, email, password, role}) {
 
     const encriptedPassword = await bcrypt.hash(password)
 
-    return Users.create ({name, lastName, userName, email, password: encriptedPassword, role})
+    return User.create ({name, lastName, userName, email, password: encriptedPassword, role})
 }
 
 // function sigIn ¿?
 
 async function signIn (email, password) {
-    const userFound = await Users.findOne({email})
+    const userFound = await User.findOne({email})
 
     if (!userFound) {
         throw new Error ('Invalid data')
@@ -45,11 +45,17 @@ async function signIn (email, password) {
 }
 
 function updateById (id, dataToUpdate) {
-    return Users.findByIdAndUpdate(id, dataToUpdate)
+    return User.findByIdAndUpdate(id, dataToUpdate)
 }
 
 function deleteById (id) {
-    return Users.findByIdAndDelete(id)
+    return User.findByIdAndDelete(id)
+}
+
+
+function getProfile(token) {
+    const { id } = jwt.decode(token);
+    return User.findById(id)
 }
 
 module.exports = {
@@ -59,5 +65,6 @@ module.exports = {
     signUp,
     signIn,
     updateById,
-    deleteById
+    deleteById,
+    getProfile
 }
