@@ -10,12 +10,12 @@ const router = express.Router ()
 // El admin tiene permiso para obtener a los usuarios
 router.get ('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
-        
+        console.log('entramos')
         const { email } = req.query 
         let users
-
+        console.log('antes validacion')
         if (email) {
-            users = await userUseCases.getByEmail (email)
+            users = await usersUseCases.getByEmail (email)
             res.status (200).json ({
                 success: true,
                 message: 'User by email',
@@ -25,8 +25,10 @@ router.get ('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async
             })
             return null
         }
-
-        users= await userUseCases.getAll()
+        console.log('despues validacion');
+        console.log('antes getall')
+        users = await usersUseCases.getAll()
+        console.log('truena')
         res.status (200).json ({
             success: true,
             messages: 'All users',

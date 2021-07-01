@@ -7,7 +7,7 @@ const usersSchema = new mongoose.Schema ({
         maxLength: 100,
         required: true
     },
-    
+
     lastName: {
         type: String,
         minLength: 2,
@@ -60,10 +60,12 @@ const usersSchema = new mongoose.Schema ({
         },
 
     purchasedCourses: [],
-
+    subscriptionId: {
+        type: String
+    }
 })
 
-const model = mongoose.model ('users', usersSchema)
+const User = mongoose.model ('users', usersSchema)
 
-module.exports = model
+module.exports = User
 
