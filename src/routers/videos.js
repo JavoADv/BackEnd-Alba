@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const videosUseCases = require('../usecases/videos');
+const authMiddleWares = require('../middlewares/auth');
 
 router.get('/', async (req, res) => {
     try {
@@ -41,7 +42,7 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
         const newVideo = req.body;
 
@@ -62,7 +63,7 @@ router.post('/', async (req, res) => {
     }
 })
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
         const { id } = req.params;
         const updatedVideoData = req.body;
@@ -84,7 +85,7 @@ router.patch('/:id', async (req, res) => {
     }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
         const { id } = req.params;
 
