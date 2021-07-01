@@ -1,22 +1,16 @@
-const express = require ('express')
-const usersUseCases = require ('../usecases/users')
-
-const authMiddleWares = require('../middlewares/auth')
-
-const router = express.Router ()
-
-// router.use(auth)
+const express = require('express');
+const usersUseCases = require('../usecases/users');
+const authMiddleWares = require('../middlewares/auth');
+const router = express.Router();
 
 // El admin tiene permiso para obtener a los usuarios
-router.get ('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
+router.get('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
-        console.log('entramos')
-        const { email } = req.query 
+        const { email } = req.query
         let users
-        console.log('antes validacion')
         if (email) {
-            users = await usersUseCases.getByEmail (email)
-            res.status (200).json ({
+            users = await usersUseCases.getByEmail(email)
+            res.status(200).json({
                 success: true,
                 message: 'User by email',
                 data: {
@@ -25,19 +19,16 @@ router.get ('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async
             })
             return null
         }
-        console.log('despues validacion');
-        console.log('antes getall')
         users = await usersUseCases.getAll()
-        console.log('truena')
-        res.status (200).json ({
+        res.status(200).json({
             success: true,
             messages: 'All users',
             data: {
                 users
-            } 
+            }
         })
     } catch (error) {
-        res.status(400).json ({
+        res.status(400).json({
             success: false,
             message: 'Error getting all users',
             data: error.message
@@ -45,19 +36,56 @@ router.get ('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async
     }
 })
 
-// Los usuarios y el admin pueden darse de alta -> authMiddleWares.hasRole(['admin, user']),
-router.post ('/signup',  async (req, res) => {
+router.get('/profile', async (req, res) => {
     try {
-        const userSignedUp = await usersUseCases.signUp(req.body)
-        res.status (200).json({
+        const { auth } = req.headers;
+        if (!auth) {
+            res.status(400).json({
+                sucess: false,
+                message: 'No auth',
+                data: null
+            })
+            return;
+        }
+        const user = await usersUseCases.getProfile(auth);
+
+        res.status(200).json({
+            sucess: true,
+            message: 'User found successfully',
+            user
+        });
+    } catch (error) {
+        res.status(400).json({
+            sucess: false,
+            message: 'No User found',
+            data: null
+        });
+    }
+})
+
+// Los usuarios y el admin pueden darse de alta -> authMiddleWares.hasRole(['admin, user']),
+router.post('/signup', async (req, res) => {
+    try {
+        const { role } = req.body;
+        let newUser = req.body;
+        if(!role){
+            newUser = {
+                ...newUser,
+                role: 'user'
+            }
+        }
+        const userSignedUp = await usersUseCases.signUp(newUser);
+        const token = await usersUseCases.signIn(newUser.email, newUser.password);
+        res.status(200).json({
             succes: true,
             message: 'User signed up',
             data: {
-                User: userSignedUp
+                User: userSignedUp,
+                token
             }
         })
     } catch (error) {
-        res.status(400).json ({
+        res.status(400).json({
             success: false,
             message: 'Could not sign up',
             data: error.message
@@ -66,13 +94,11 @@ router.post ('/signup',  async (req, res) => {
     }
 })
 
-// ¿El router de signIn?
-//Todos los usuarios pueden entrar 
-router.post('/sigin', authMiddleWares.auth, authMiddleWares.hasRole(['admin, user, partner']), async (req, res)=>{
+router.post('/signIn', async (req, res) => {
     try {
-        const {email, password} = req.body
-        const token = await users.signin(email, password)//login¿?
-        res.json ({
+        const { email, password } = req.body
+        const token = await usersUseCases.signIn(email, password)
+        res.status(200).json({
             success: true,
             message: 'Signed In',
             data: {
@@ -81,24 +107,24 @@ router.post('/sigin', authMiddleWares.auth, authMiddleWares.hasRole(['admin, use
         })
 
     } catch (error) {
-        res.status(400).json ({
+        res.status(400).json({
             success: false,
             message: 'Could not sign in',
             data: error.message
-        
+
         })
     }
 })
 
 //El admin tiene permiso para actualizar 
-router.patch ('/:id', authMiddleWares.auth,  authMiddleWares.hasRole(['admin']), async (req, res) => {
+router.patch('/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         const dataUpdated = req.body
 
         const userUpdated = await usersUseCases.updateById(id, dataUpdated)
 
-        res.status (200).json ({
+        res.status(200).json({
             success: true,
             message: 'Data updated successfully',
             data: {
@@ -116,11 +142,11 @@ router.patch ('/:id', authMiddleWares.auth,  authMiddleWares.hasRole(['admin']),
 })
 
 //El admin tiene permiso para borrar 
-router.delete('/:id',authMiddleWares.auth,  authMiddleWares.hasRole(['admin']), async (req, res) => {
+router.delete('/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
-        const {id} = req.params
+        const { id } = req.params
         const userDeleted = await usersUseCases.deleteById(id)
-        res.status (200).json({
+        res.status(200).json({
             success: true,
             message: 'User deleted successfully',
             data: {
@@ -132,8 +158,8 @@ router.delete('/:id',authMiddleWares.auth,  authMiddleWares.hasRole(['admin']), 
             success: false,
             message: 'Error deleting user',
             data: error.message
-        
-    })
+
+        })
     }
 })
 
