@@ -36,7 +36,7 @@ router.get('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async 
     }
 })
 
-router.get('/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
+router.get('/user/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
         const { id } = req.params
         const user = await usersUseCases.getById(id); 
