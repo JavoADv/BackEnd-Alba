@@ -37,7 +37,12 @@ async function signIn(email, password) {
     })
 }
 
-function updateById(id, dataToUpdate) {
+async function updateById(id, dataToUpdate) {
+    let encriptedPassword;
+    if(dataToUpdate.password){
+        encriptedPassword = await bcrypt.hash(dataToUpdate.password);
+        dataToUpdate.password = encriptedPassword;
+    }
     return User.findByIdAndUpdate(id, dataToUpdate)
 }
 
