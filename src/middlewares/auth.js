@@ -1,31 +1,30 @@
-const jwt = require ('../lib/jwt')
-const users = require ('../usecases/users')
+const jwt = require('../lib/jwt')
+const users = require('../usecases/users')
 
-function auth (req, res, next) {
-   try {
-    const {auth: token } = req.headers
-    console.log('token: ', token)
-    const validToken = jwt.verify(token)
-    if (!validToken) {
-        throw new Error('Not authorized')
+function auth(req, res, next) {
+    try {
+        const { auth: token } = req.headers
+        const validToken = jwt.verify(token)
+        if (!validToken) {
+            throw new Error('Not authorized')
+        }
+        next()
+    } catch (error) {
+        res.status(401)
+        res.json({
+            success: false,
+            message: 'Not authorized',
+            error: error.message,
+        })
+
     }
-    next()
-   } catch (error) {
-       res.status(401)
-       res.json({
-           success: false,
-           message: 'Not authorized',
-           error: error.message,
-       })
-       
-   }
 }
 
-function hasRole (allowedRoles) {
+function hasRole(allowedRoles) {
     return async (req, res, next) => {
         try {
-            const {auth: token } = req.headers
-            
+            const { auth: token } = req.headers
+
             const validToken = jwt.verify(token)
             if (!validToken) {
                 throw new Error('Not authorized')
@@ -43,18 +42,19 @@ function hasRole (allowedRoles) {
             }
 
             next()
-           } catch (error) {
-               res.status(401)
-               res.json({
-                   success: false,
-                   message: 'Not authorized',
-                   error: error.message,
-               })
-               
-           } 
+        } catch (error) {
+            res.status(401)
+            res.json({
+                success: false,
+                message: 'Not authorized',
+                error: error.message,
+            })
+
+        }
     }
 }
 
-module.exports = {auth,
+module.exports = {
+    auth,
     hasRole
 }

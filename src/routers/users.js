@@ -36,6 +36,26 @@ router.get('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async 
     }
 })
 
+router.get('/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
+    try {
+        const { id } = req.params
+        const user = await usersUseCases.getById(id); 
+        res.status(200).json({
+            success: true,
+            messages: 'User by id',
+            data: {
+                user
+            }
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: 'Error getting userById',
+            data: error.message
+        })
+    }
+})
+
 router.get('/profile', async (req, res) => {
     try {
         const { auth } = req.headers;
