@@ -52,6 +52,10 @@ function deleteById (id) {
     return Users.findByIdAndDelete(id)
 }
 
+function getByRole (role) {
+    return Users.find ({role})
+}
+
 module.exports = {
     getAll,
     getByEmail,
@@ -59,5 +63,6 @@ module.exports = {
     signUp,
     signIn,
     updateById,
-    deleteById
+    deleteById,
+    getByRole
 }

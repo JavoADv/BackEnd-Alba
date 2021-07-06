@@ -8,32 +8,42 @@ const router = express.Router ()
 // router.use(auth)
 
 // El admin tiene permiso para obtener a los usuarios
-router.get ('/', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
-    try {
-        
-        const { email } = req.query 
-        let users
+//                 }
+//             })
+//             return null
+//         }
+//         users = await usersUseCases.getAll()
+//         res.status(200).json({
+//             success: true,
+//             messages: 'All users',
+//             data: {
+//                 users
+//             }
+//         })
+//     } catch (error) {
+//         res.status(400).json({
+//             success: false,
+//             message: 'Error getting all users',
+//             data: error.message
+//         })
+//     }
+// })
 
-        if (email) {
-            users = await userUseCases.getByEmail (email)
-            res.status (200).json ({
+router.get ('/', async (req, res) => {
+    try {
+        const {role} = req.query
+        let users
+        if (role === 'partner') {
+            users = await usersUseCases.getByRole(role)
+            res.status(200).json({
                 success: true,
-                message: 'User by email',
+                message: 'User by role',
                 data: {
                     users
                 }
             })
             return null
         }
-
-        users= await userUseCases.getAll()
-        res.status (200).json ({
-            success: true,
-            messages: 'All users',
-            data: {
-                users
-            } 
-        })
     } catch (error) {
         res.status(400).json ({
             success: false,

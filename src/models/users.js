@@ -60,7 +60,23 @@ const usersSchema = new mongoose.Schema ({
         },
 
     purchasedCourses: [],
+    purchasedId: {      //<- 'subscriptionId'
+        type: String
+    },
 
+    // uploadedCourses: [],
+    // title: {
+    //     type: String,
+    //     minLength: 2,
+    //     maxLength: 100,
+    //     required: false
+    // },
+    // courseId: {
+    //     type: String,
+    //     minLength: 2,
+    //     maxLength: 100,
+    //     required: false
+    // }
 })
 
 const model = mongoose.model ('users', usersSchema)
