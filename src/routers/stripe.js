@@ -5,10 +5,10 @@ const userUsesCases = require('../usecases/users');
 const authMiddlewares = require('../middlewares/auth');
 
 
-router.patch('/success', authMiddlewares.auth ,async (req, res) => {
+router.get('/success', authMiddlewares.auth, async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
     const subscription = await stripe.subscriptions.retrieve(session.subscription);
-    
+
     const { auth } = req.headers;
     if (!auth) {
         res.status(400).json({
@@ -21,8 +21,8 @@ router.patch('/success', authMiddlewares.auth ,async (req, res) => {
 
     /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
     const user = await userUsesCases.getProfile(auth);
-    const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: subscription.id});
-    res.redirect('/success/completed-subscription');
+    const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: subscription.id });
+    res.send(`<html><body><h1>Gracias por suscribirte ${user.name}!</h1></body></html>`);
     res.end();
 });
 
@@ -122,8 +122,8 @@ router.post('/create-checkout-session', authMiddlewares.auth, async (req, res) =
                     quantity: 1,
                 },
             ],
-            success_url: 'https://dev-alba.herokuapp.com'+'/stripe/success?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url: 'https://dev-alba.herokuapp.com'+'/stripe/canceled',
+            success_url: 'https://dev-alba.herokuapp.com' + '/stripe/success?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url: 'https://dev-alba.herokuapp.com' + '/stripe/canceled',
         });
 
         res.send({
