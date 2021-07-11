@@ -5,11 +5,11 @@ const userUsesCases = require('../usecases/users');
 const authMiddlewares = require('../middlewares/auth');
 
 
-router.get('/success', authMiddlewares.auth, async (req, res) => {
+router.get('/success', async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
     const subscription = await stripe.subscriptions.retrieve(session.subscription);
 
-    const { auth } = req.headers;
+    const { auth } = req.params;
     if (!auth) {
         res.status(400).json({
             sucess: false,
@@ -112,6 +112,7 @@ router.get('/canceled', authMiddlewares.auth, async (req, res) => {
 
 router.post('/create-checkout-session', authMiddlewares.auth, async (req, res) => {
     const { priceId } = req.body;
+    const { auth } = req.headers;
     try {
         const session = await stripe.checkout.sessions.create({
             mode: 'subscription',
@@ -122,7 +123,7 @@ router.post('/create-checkout-session', authMiddlewares.auth, async (req, res) =
                     quantity: 1,
                 },
             ],
-            success_url: 'https://dev-alba.herokuapp.com' + '/stripe/success?session_id={CHECKOUT_SESSION_ID}',
+            success_url: 'https://dev-alba.herokuapp.com' + '/stripe/success?session_id={CHECKOUT_SESSION_ID}&user='+auth,
             cancel_url: 'https://dev-alba.herokuapp.com' + '/stripe/canceled',
         });
 
