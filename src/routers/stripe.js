@@ -123,7 +123,7 @@ router.post('/create-checkout-session', authMiddlewares.auth, async (req, res) =
                     quantity: 1,
                 },
             ],
-            success_url: 'https://dev-alba.herokuapp.com' + '/stripe/success?session_id={CHECKOUT_SESSION_ID}&user='+auth,
+            success_url: 'https://dev-alba.herokuapp.com' + '/stripe/success?session_id={CHECKOUT_SESSION_ID}&auth='+auth,
             cancel_url: 'https://dev-alba.herokuapp.com' + '/stripe/canceled',
         });
 
