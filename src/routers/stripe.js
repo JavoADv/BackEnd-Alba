@@ -26,22 +26,6 @@ router.get('/success', async (req, res) => {
     res.end();
 });
 
-router.get('/success/completed-subscription', authMiddlewares.auth, async (req, res) => {
-    const { auth } = req.headers;
-    if (!auth) {
-        res.status(400).json({
-            sucess: false,
-            message: 'No auth',
-            data: null
-        })
-        return;
-    }
-    /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
-    const user = await userUsesCases.getProfile(auth);
-    res.redirect('/success/completed-subscription');
-    res.send(`<html><body><h1>Gracias por suscribirte ${user.name}!</h1></body></html>`);
-    res.end();
-});
 
 router.get('/subscription', authMiddlewares.auth, async (req, res) => {
     try {
@@ -88,7 +72,11 @@ router.get('/subscription', authMiddlewares.auth, async (req, res) => {
 router.delete('/subscriptions/:id', authMiddlewares.auth, async (req, res) => {
     try {
         const { id } = req.params;
+        const { auth } = req.headers;
         const canceledSub = await stripe.subscriptions.del(id);
+        const user = await userUsesCases.getProfile(auth);
+        const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: '' });
+        
         res.status(200).json({
             sucess: true,
             message: 'Subscription cancel request successfully',
