@@ -9,7 +9,7 @@ router.get('/success', async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
     const subscription = await stripe.subscriptions.retrieve(session.subscription);
 
-    const { auth } = req.params;
+    const { auth } = req.query;
     if (!auth) {
         res.status(400).json({
             sucess: false,
