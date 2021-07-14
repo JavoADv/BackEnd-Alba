@@ -5,25 +5,40 @@ const userUsesCases = require('../usecases/users');
 const authMiddlewares = require('../middlewares/auth');
 
 
-router.get('/success', async (req, res) => {
-    const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
-    const subscription = await stripe.subscriptions.retrieve(session.subscription);
+router.post('/create-subscription', authMiddlewares.auth, async (req, res) => {
+    try {
+        const { session_id } = req.body;
+        const session = await stripe.checkout.sessions.retrieve(session_id);
+        const subscription = await stripe.subscriptions.retrieve(session.subscription);
+        const { auth } = req.headers;
+        if (!auth) {
+            res.status(400).json({
+                sucess: false,
+                message: 'No auth',
+                data: null
+            })
+            return;
+        }
 
-    const { auth } = req.query;
-    if (!auth) {
+        /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
+        const user = await userUsesCases.getProfile(auth);
+        const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: subscription.id });
+        console.log(updatedUser)
+        res.status(200).json({
+            success: true,
+            message: 'User subscribed',
+            data: {
+                user: updatedUser
+            }
+        })
+
+    } catch (error) {
         res.status(400).json({
             sucess: false,
             message: 'No auth',
             data: null
         })
-        return;
     }
-
-    /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
-    const user = await userUsesCases.getProfile(auth);
-    const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: subscription.id });
-    res.send(`<html><body><h1>Gracias por suscribirte ${user.name}!</h1></body></html>`);
-    res.end();
 });
 
 
@@ -46,7 +61,7 @@ router.get('/subscription', authMiddlewares.auth, async (req, res) => {
         if (!subscriptionId) {
             res.status(400).json({
                 sucess: false,
-                message: 'No Subscription Id',
+                message: error.message,
                 data: null
             })
             return;
@@ -76,7 +91,7 @@ router.delete('/subscriptions/:id', authMiddlewares.auth, async (req, res) => {
         const canceledSub = await stripe.subscriptions.del(id);
         const user = await userUsesCases.getProfile(auth);
         const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: '' });
-        
+
         res.status(200).json({
             sucess: true,
             message: 'Subscription cancel request successfully',
@@ -111,8 +126,8 @@ router.post('/create-checkout-session', authMiddlewares.auth, async (req, res) =
                     quantity: 1,
                 },
             ],
-            success_url: 'https://dev-alba.herokuapp.com' + '/stripe/success?session_id={CHECKOUT_SESSION_ID}&auth='+auth,
-            cancel_url: 'https://dev-alba.herokuapp.com' + '/stripe/canceled',
+            success_url: 'http://localhost:3000' + '/stripe/success?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url: 'http://localhost:3000' + '/stripe/canceled',
         });
 
         res.send({
