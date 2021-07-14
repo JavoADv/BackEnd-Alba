@@ -162,31 +162,6 @@ router.post('/signIn', async (req, res) => {
     }
 })
 
-//El admin tiene permiso para actualizar 
-router.patch('/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
-    try {
-        const { id } = req.params
-        const dataUpdated = req.body
-
-        const userUpdated = await usersUseCases.updateById(id, dataUpdated)
-
-        res.status(200).json({
-            success: true,
-            message: 'Data updated successfully',
-            data: {
-                user: userUpdated
-            }
-        })
-
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: 'Error updating data',
-            data: error.message
-        })
-    }
-})
-
 router.patch('/add-course', authMiddleWares.auth, async (req, res) => {
     try {
         const { auth } = req.headers;
@@ -224,6 +199,30 @@ router.patch('/add-course', authMiddleWares.auth, async (req, res) => {
         res.status(400).json({
             success: false,
             message: 'Error updating purcharseCourses',
+            data: error.message
+        })
+    }
+})
+
+router.patch('/user/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
+    try {
+        const { id } = req.params
+        const dataUpdated = req.body
+
+        const userUpdated = await usersUseCases.updateById(id, dataUpdated)
+
+        res.status(200).json({
+            success: true,
+            message: 'Data updated successfully',
+            data: {
+                user: userUpdated
+            }
+        })
+
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: 'Error updating data',
             data: error.message
         })
     }
