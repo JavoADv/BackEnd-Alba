@@ -10,6 +10,7 @@ router.post('/create-subscription', authMiddlewares.auth, async (req, res) => {
         const session = await stripe.checkout.sessions.retrieve(session_id);
         const subscription = await stripe.subscriptions.retrieve(session.subscription);
         const { auth } = req.headers;
+
         if (!auth) {
             res.status(400).json({
                 sucess: false,
@@ -18,7 +19,6 @@ router.post('/create-subscription', authMiddlewares.auth, async (req, res) => {
             })
             return;
         }
-
         /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
         const user = await userUsesCases.getProfile(auth);
         const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: subscription.id });
@@ -88,7 +88,7 @@ router.delete('/subscriptions/:id', authMiddlewares.auth, async (req, res) => {
         const { auth } = req.headers;
         const canceledSub = await stripe.subscriptions.del(id);
         const user = await userUsesCases.getProfile(auth);
-        const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: '' });
+        const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: '', purchasedCourses: [] });
 
         res.status(200).json({
             sucess: true,
