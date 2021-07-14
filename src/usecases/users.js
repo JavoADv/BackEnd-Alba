@@ -55,6 +55,16 @@ function getProfile(token) {
     return User.findById(user.id);
 }
 
+function updateCoursesById(id, courseId) {
+    return User.findByIdAndUpdate(id, {
+        $push: {
+            purchasedCourses: [
+                courseId
+            ]
+        }
+    })
+}
+
 module.exports = {
     getAll,
     getByEmail,
@@ -63,5 +73,6 @@ module.exports = {
     signIn,
     updateById,
     deleteById,
-    getProfile
+    getProfile,
+    updateCoursesById
 }

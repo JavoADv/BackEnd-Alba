@@ -187,6 +187,48 @@ router.patch('/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), a
     }
 })
 
+router.patch('/add-course', authMiddleWares.auth, async (req, res) => {
+    try {
+        const { auth } = req.headers;
+        if (!auth) {
+            res.status(400).json({
+                sucess: false,
+                message: 'No auth',
+                data: null
+            })
+            return;
+        }
+        const user = await usersUseCases.getProfile(auth);
+        if (!user.subscriptionId) {
+            if (!auth) {
+                res.status(400).json({
+                    sucess: false,
+                    message: 'No user sub',
+                    data: null
+                })
+                return;
+            }
+        }
+        const dataUpdated = req.body;
+        const userUpdated = await usersUseCases.updateCoursesById(user._id, dataUpdated);
+
+        res.status(200).json({
+            success: true,
+            message: 'Data updated successfully',
+            data: {
+                user: userUpdated
+            }
+        })
+
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: 'Error updating purcharseCourses',
+            data: error.message
+        })
+    }
+})
+
 //El admin tiene permiso para borrar 
 router.delete('/:id', authMiddleWares.auth, authMiddleWares.hasRole(['admin']), async (req, res) => {
     try {
