@@ -60,12 +60,17 @@ router.get('/mentor/:id', async (req, res) => {
     try {
         const { id } = req.params
         const user = await usersUseCases.getById(id);
-
+        const protectedUser = {
+            name: user.name,
+            lastName: user.lastName,
+            userName: user.userName,
+            email: user.email
+        }
         res.status(200).json({
             success: true,
             messages: 'User by id',
             data: {
-                user
+                user: protectedUser
             }
         })
     } catch (error) {
