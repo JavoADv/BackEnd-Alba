@@ -4,7 +4,6 @@ const stripe = require('stripe')(SECRET_STRIPE_KEY);
 const userUsesCases = require('../usecases/users');
 const authMiddlewares = require('../middlewares/auth');
 
-
 router.post('/create-subscription', authMiddlewares.auth, async (req, res) => {
     try {
         const { session_id } = req.body;
@@ -23,7 +22,6 @@ router.post('/create-subscription', authMiddlewares.auth, async (req, res) => {
         /* SE AGREGA SUBSCRIPTION_ID AL USUARIO LOGGEADO */
         const user = await userUsesCases.getProfile(auth);
         const updatedUser = await userUsesCases.updateById(user._id, { subscriptionId: subscription.id });
-        console.log(updatedUser)
         res.status(200).json({
             success: true,
             message: 'User subscribed',
@@ -126,8 +124,8 @@ router.post('/create-checkout-session', authMiddlewares.auth, async (req, res) =
                     quantity: 1,
                 },
             ],
-            success_url: 'http://localhost:3000' + '/stripe/success?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url: 'http://localhost:3000' + '/stripe/canceled',
+            success_url: process.env.FRONT_HOST + '/stripe/success?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url: process.env.FRONT_HOST + '/stripe/canceled',
         });
 
         res.send({
