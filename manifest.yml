@@ -1,0 +1,5 @@
+applications:
+- name: alba-app
+  memory: 128M
+  random-route: true
+  stack: cflinuxfs3

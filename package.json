@@ -22,6 +22,10 @@
     "mongoose": "^5.12.13",
     "stripe": "^8.156.0"
   },
+  "engines": {
+    "node": "15",
+    "npm": "6"
+  },
   "devDependencies": {
     "nodemon": "^2.0.7"
   }
