@@ -11,8 +11,8 @@ function getByCategory(categoryId) {
     return Course.findOne({ categoryId })
 }
 
-function create({ authorId, title, description, categoryId, createdDate, price, imgUrl }) {
-    return Course.create({ authorId, title, description, categoryId, createdDate, price, imgUrl })
+function create({ authorId, title, description, categoryId, createdDate, price, imgUrl, isFree }) {
+    return Course.create({ authorId, title, description, categoryId, createdDate, price, imgUrl, isFree })
 }
 
 function updateById(id, dataToUpdate){
